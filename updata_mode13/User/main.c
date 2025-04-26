@@ -67,11 +67,11 @@ int main(void)
 		//模式一 自动
 		if(Mode==1)
 		{
-			Serial_1_SendByte(0XF1);
 			switch(Flag) 
 		  {
+				
 				case 0 ://在搜索图片
-				Serial_1_SendByte(0xFF);
+				Serial_1_SendByte(0XF1);
 				break;
 				
 				case 1://开始移动
