@@ -13,6 +13,7 @@ xyz_fenlei:
 前三个是目标物体的xyz参数
 第四个是物体的分类
 *******/
+u8 Flag_mode = 0;
 float xyz_fenlei[4]   ={90    ,0   ,100   ,1};
 
 //定义初始位置
@@ -27,7 +28,7 @@ float temp_xyz[4]			= {6.59 ,0   ,162,1 };
 float cut_error[3]		= {0    ,7   ,130   };
 
 //蓝牙模式
-float Blue[4] 	 = {0} ;
+float Blue[4] 	 = {90,0,180} ;
 u8 		Blue_Flag  =  0  ;
 u8 		Flag       =  0  ;
 u8 		color      =  0  ;
@@ -57,105 +58,132 @@ int main(void)
 	Serial_1_Init();						//上位机串口初始化
 	Serial_2_Init();						//串口初始化	
 	PWM_Init();									//舵机初始化
-
+	LED_Init();
+		pwm_Move_target_grab(begin_xyz);
+		Servo_SetAngle4(130);
+	
+	
 	short i = 0 ;
 	u8    j = 0 ;
 	while (1)
 	{
+
 		Mode = Key_GetNum();
 		Mode_show(Mode);
 		//模式一 自动
 		if(Mode==1)
 		{
-			switch(Flag) 
-		  {
-				
-				case 0 ://在搜索图片
-				Serial_1_SendByte(0XF1);
-				break;
-				
-				case 1://开始移动
-				//接收到了数据，获取到了物体的xyz坐标
-				if(xyz_fenlei[3]==1)		 color = 1;//red
-				else if(xyz_fenlei[3]==2)color = 2;//blue
-				Serial_1_SendByte(0XFE);
-				//开始移动 移动到物体坐标
-				xyz_fenlei[0]-=7;
-				xyz_fenlei[1]= 17;
-				xyz_fenlei[2]-=60;
-				cut_error[0]=xyz_fenlei[0]*0.8;
-				cut_error[1]=30;
-				cut_error[2]=xyz_fenlei[2]*0.8;
-				pwm_Move_to_release(cut_error);
-				Delay_ms(2000);
-				pwm_Move_target_grab(xyz_fenlei);
-				Delay_ms(500);
-				//移动完毕后标志位置2
-				Flag=2;
-				//获取到了达到目标所需要的舵机角度哦
-				break;
-				
-				case 2://抓取？
-				//舵机四
-				Servo_SetAngle4(70);
-				Delay_ms(500);
-				Flag=3;
-				break;
-				
-				case 3 ://移动至恰当balancexyz轴
-				pwm_Move_to_release(balance_xyz);
-				Delay_ms(500);
-				Flag=4;
-				break;
-				
-				case 4 ://移动至放置位置
-				Delay_ms(500);
-				if(color == 1)//red  左？
-					pwm_Move_to_release(end_red_xyz);
-				else if(color == 2)//blue 右？
-					pwm_Move_to_release(end_blue_xyz);
-				Flag=5;
-				break;
-				
-				case 5 ://松手
-				Delay_ms(1000);
-				Servo_SetAngle4(110);
-				Delay_ms(500);
-				Flag=6;
-				break;		
-				
-				case 6 ://归中
-				pwm_Move_to_release(balance_xyz);	
-				Delay_ms(500);
-				Flag=7;
-				break;	
-				
-				case 7 ://从中间位置复位
-				
-				pwm_Move_to_release(begin_xyz);
-				Delay_ms(500);
-				Flag=8;
-				break;
-				
-				case 8 ://灯亮
-				Flag=0;
-				break;
+			if(Flag_mode==0)
+			{
+				Flag_mode=1;
+			}
+			else if(Flag_mode==1)
+			{
+				pwm_Move_target_grab(begin_xyz);
 
-		  }		
+				Servo_SetAngle4(130);	
+				Delay_ms(500);
+				Flag_mode=2;
+				
+			}
+					switch(Flag) 
+					{
+						case 0 ://在搜索图片
+						Serial_1_SendByte(0XFC);
+						break;
+						
+						case 1://开始移动
+						//接收到了数据，获取到了物体的xyz坐标
+						if(xyz_fenlei[3]==1)		 color = 1;//red
+						else if(xyz_fenlei[3]==2)color = 2;//blue
+						Serial_1_SendByte(0XFE);
+						//开始移动 移动到物体坐标
+						xyz_fenlei[0]-=7;
+						xyz_fenlei[1]= 17;
+						xyz_fenlei[2]-=60;
+						cut_error[0]=xyz_fenlei[0]*0.8;
+						cut_error[1]=30;
+						cut_error[2]=xyz_fenlei[2]*0.8;
+						pwm_Move_to_release(cut_error);
+						Delay_ms(2000);
+						pwm_Move_target_grab(xyz_fenlei);
+						Delay_ms(500);
+						
+						
+
+						//移动完毕后标志位置2
+						Flag=2;
+						//获取到了达到目标所需要的舵机角度哦
+						break;
+						
+						case 2://抓取？
+						//舵机四
+						Servo_SetAngle4(70);
+						Delay_ms(500);
+						Flag=3;
+						break;
+						
+						case 3 ://移动至恰当balancexyz轴
+						pwm_Move_to_release(balance_xyz);
+						Delay_ms(500);
+						Flag=4;
+						break;
+						
+						case 4 ://移动至放置位置
+						Delay_ms(500);
+						if(color == 1)//red  左？
+							pwm_Move_to_release(end_red_xyz);
+						else if(color == 2)//blue 右？
+							pwm_Move_to_release(end_blue_xyz);
+						Flag=5;
+						break;
+						
+						case 5 ://松手
+						Delay_ms(1000);
+						Servo_SetAngle4(130);
+						Delay_ms(500);
+						Flag=6;
+						break;		
+						
+						case 6 ://归中
+						pwm_Move_to_release(balance_xyz);	
+						Delay_ms(500);
+						Flag=7;
+						break;	
+						
+						case 7 ://从中间位置复位
+						
+						pwm_Move_to_release(begin_xyz);
+						Delay_ms(500);
+						Flag=8;
+						break;
+						
+						case 8 ://灯亮
+						Flag=0;
+						break;
+
+					
+			}
+
 		}
 		else if(Mode==2)
 		{
+			Flag_mode=0;
 			Serial_1_SendByte(0XF0);
 			Blue_MOVE(Blue);
 			i++;
 			if(i==5000)
 			{
-				if(j==0)LED_ON();
-				else if(j !=0 )
-				{
-					LED_OFF();
-					j=0;
-				}
+//				if(j==0)
+//				{
+//					LED_ON();
+//					j=1;
+//				}
+//				else if(j !=0 )
+//				{
+//					LED_OFF();
+//					j=0;
+//				}
 				i=0;
 			}
 		}

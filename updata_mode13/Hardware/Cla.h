@@ -2,6 +2,7 @@
 #define __CLA_H
 #include "stm32f10x.h"
 
+
 void ABC_Trun(float* abc_fenlei);
 void xyz_to_jiaodu(float* xyz_fenlei,float* abc_fenlei);
 void Cla_Data(u8* Data,float* xyz_fenlei);

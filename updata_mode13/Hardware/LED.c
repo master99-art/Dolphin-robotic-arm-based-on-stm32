@@ -8,17 +8,17 @@
 void LED_Init(void)
 {
 	/*开启时钟*/
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);		//开启GPIOA的时钟
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);		//开启GPIOA的时钟
 	
 	/*GPIO初始化*/
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_13;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);						//将PA1和PA2引脚初始化为推挽输出
+	GPIO_Init(GPIOC, &GPIO_InitStructure);						//将PA1和PA2引脚初始化为推挽输出
 	
 	/*设置GPIO初始化后的默认电平*/
-	GPIO_SetBits(GPIOA, GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5);				//设置PA1和PA2引脚为高电平
+	GPIO_SetBits(GPIOC, GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_13);				//设置PA1和PA2引脚为高电平
 }
 /********************
 A1 mode 1
@@ -29,22 +29,22 @@ void Mode_show(u8 Mode)
 {
 	if(Mode==1)
 	{
-		GPIO_SetBits(GPIOA, GPIO_Pin_1);
+		GPIO_SetBits(GPIOC, GPIO_Pin_13);
 		GPIO_ResetBits(GPIOA, GPIO_Pin_4);
 	}
 	else if(Mode==2)
 	{
-		GPIO_ResetBits(GPIOA, GPIO_Pin_1);
+		GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 		GPIO_SetBits(GPIOA, GPIO_Pin_4);		
 	}
 }
 
 void LED_ON(void)
 {
-	GPIO_SetBits(GPIOA, GPIO_Pin_5);
+	GPIO_SetBits(GPIOC, GPIO_Pin_13);
 }
 void LED_OFF(void)
 {
-	GPIO_ResetBits(GPIOA, GPIO_Pin_5);
+	GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 }
 
