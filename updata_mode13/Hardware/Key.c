@@ -24,13 +24,12 @@ uint8_t Key_GetNum(void)
 {
 	uint8_t KeyNum = 1;		
 	
-	if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 1)			//读PB1输入寄存器的状态，如果为0，则代表按键1按下
+	if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 1)			
 	{
 		Delay_ms(20);											//延时消抖
-		//while (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 1);	//等待按键松手
-		//Delay_ms(20);											//延时消抖
+	
 		KeyNum = 2;												//置键码为2
 	}
 
-	return KeyNum;			//返回键码值，如果没有按键按下，所有if都不成立，则键码为默认值0
+	return KeyNum;			
 }
